@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import argparse
 import os
 import sys
@@ -30,9 +30,10 @@ class LedClockDaemon(Daemon):
         self.setup_logging()
 
         scheduler = BlockingScheduler()
-        weather = Weather(scheduler, zip=self._args['zip'], station=self._args['station'])
+        #weather = Weather(scheduler, zip=self._args['zip'], station=self._args['station'])
         dimmer = Dimmer(scheduler)
-        display = Display(weather, dimmer)
+        #display = Display(weather, dimmer)
+        display = Display(dimmer)
 
         display.start()
         scheduler.start()
@@ -42,7 +43,7 @@ def process_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--pidfile", help="PID file name", type=str, default="/var/run/ledclock.pid")
     parser.add_argument("-l", "--logfile", help="Log file name", type=str, default="/var/log/ledclock.log")
-    parser.add_argument("-d", "--daemon", help="start stop restart", type=str)
+    parser.add_argument("-d", "--daemon", help="NOT IMPLEMENTED start stop restart", type=str)
     parser.add_argument("-s", "--station", help="NOAA station ID for current weather conditions", default="KLOU")
     parser.add_argument("-z", "--zip", help="ZIP code for weather forecast", default="40207")
 
@@ -56,7 +57,7 @@ if __name__ == "__main__":
 
     # Verify running as root.  Unfortunately, this is required to access /dev/mem by the rgbmatrix lib
     if os.getuid() != 0:
-        print "Must run as root!"
+        print ("Must run as root!")
         sys.exit(-1)
 
     daemon = LedClockDaemon(args)
@@ -66,7 +67,7 @@ if __name__ == "__main__":
             print("Press CTRL-C to exit")
             daemon.run()
         except KeyboardInterrupt:
-            print "Exiting\n"
+            print ("Exiting\n")
             sys.exit(0)
     elif args['daemon'] == 'start':
         daemon.start()
@@ -75,4 +76,4 @@ if __name__ == "__main__":
     elif args['daemon'] == 'restart':
         daemon.restart()
     else:
-        print "Invalid daemon action"
+        print ("Invalid daemon action")
